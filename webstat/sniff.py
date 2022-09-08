@@ -7,6 +7,7 @@ from scapy.layers.inet import IP, TCP
 from colorama import init, Fore
 from collections import Counter as cCount
 from prometheus_client import Counter, Gauge
+import sys
 
 # initialize colorama
 init()
@@ -63,7 +64,7 @@ def process_packet(packet):
                 host = packet[HTTPRequest].Host.decode()
                 path = packet[HTTPRequest].Path.decode()
             else:
-                print(f"Host: {packet[HTTPRequest].Host}, path: {packet[HTTPRequest].Path}")
+                print(f'Host: {packet[HTTPRequest].Host}, path: {packet[HTTPRequest].Path}')
             
             # get the requester's IP Address
             ip_source = packet[IP].src
@@ -87,20 +88,17 @@ def process_packet(packet):
         if HTTPResponse in packet:
             status = packet[HTTPResponse].Status_Code.decode()
             response_content = tuple([status])
-            print(f"\n{GREEN}[-] \ Status code {status}{RESET}")
+            #print(f"\n{GREEN}[-] \ Status code {status}{RESET}")
             packet_response_counts.update([response_content])
 
 
-def sniff_mode():
-    import argparse
-    parser = argparse.ArgumentParser(description="HTTP Packet Sniffer, this is useful when you're a man in the middle." \
-                                                 + "It is suggested that you run arp spoof before you use this script, otherwise it'll sniff your personal packets")
-    parser.add_argument("-i", "--iface", help="Interface to use, default is scapy's default interface")
-    parser.add_argument("--show-raw", dest="show_raw", action="store_true", help="Whether to print POST raw data, such as passwords, search queries, etc.")
-
-    # parse arguments
-    args = parser.parse_args()
-    iface = args.iface
+def sniff_mode(arg):
     # show_raw = args.show_raw
 
-    sniff_packets(iface)
+    #Write output to file
+    if arg.output != None:
+
+        sys.stdout = open('requests.txt', 'w')
+
+
+    sniff_packets(arg.iface)

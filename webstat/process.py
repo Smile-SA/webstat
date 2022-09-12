@@ -61,11 +61,7 @@ def process_pcap(file_name):
 
     return df
 
-def analyze_mode():
-    parser = argparse.ArgumentParser(description='PCAP reader')
-    parser.add_argument('--pcap', metavar='<pcap file name>',
-                        help='pcap file to parse', required=True)
-    args = parser.parse_args()
+def analyze_mode(args):
     
     file_name = args.pcap
     if not os.path.isfile(file_name):

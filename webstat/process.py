@@ -6,7 +6,7 @@ import time
 from scapy.utils import RawPcapReader
 from scapy.layers.l2 import Ether
 from scapy.layers.inet import IP, TCP
-from analyze import summary_anaylyze
+from webstat.analyze import summary_anaylyze
 import pandas as pd
 
 
@@ -73,5 +73,5 @@ def analyze_mode(args):
 
         sys.exit(0)
     else:
-                print('pcap file is required')
+        print('pcap file is required')
 

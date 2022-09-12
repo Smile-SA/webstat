@@ -1,5 +1,5 @@
-from process import analyze_mode
-from sniff import sniff_mode
+from webstat.process import analyze_mode
+from webstat.sniff import sniff_mode
 from prometheus_client import start_http_server
 import argparse
 

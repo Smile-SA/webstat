@@ -6,7 +6,7 @@ import time
 from scapy.utils import RawPcapReader
 from scapy.layers.l2 import Ether
 from scapy.layers.inet import IP, TCP
-from webstat.analyze import summary_anaylyze
+from analyze import summary_anaylyze
 import pandas as pd
 
 
@@ -62,13 +62,16 @@ def process_pcap(file_name):
     return df
 
 def analyze_mode(args):
-    
-    file_name = args.pcap
-    if not os.path.isfile(file_name):
-        print('"{}" does not exist'.format(file_name),file=sys.stderr)
-        sys.exit(-1)
+    if args.pcap != None:
+        file_name = args.pcap
+        if not os.path.isfile(file_name):
+            print('"{}" does not exist'.format(file_name),file=sys.stderr)
+            sys.exit(-1)
 
-    df = process_pcap(file_name)
-    summary_anaylyze(df)
+        df = process_pcap(file_name)
+        summary_anaylyze(df)
 
-    sys.exit(0)
+        sys.exit(0)
+    else:
+                print('pcap file is required')
+

@@ -84,7 +84,7 @@ def process_packet(packet):
             packet_destination_counts.update([destination_source])
 
             print(f"\n{GREEN}[+] \{ip_source} Requested {host+path} with {method}{RESET}")
-            with open('data.json', 'w') as fp:
+            with open('/home/ubuntu/data.json', 'w') as fp:
                 json.dump(sniff_dt, fp)
 
 

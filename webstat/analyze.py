@@ -22,7 +22,7 @@ def http_analyze(df):
 
 def summary_anaylyze():
     
-    with open("/home/ubuntu/data.json", "r") as json_file:
+    with open("data.json", "r") as json_file:
         my_dict = json.load(json_file)
         sniff_df = pd.DataFrame.from_dict(my_dict).rename(columns = {'ip_source':'IP_SOURCE','host':'DOMAIN'})
         

@@ -1,9 +1,10 @@
+import json
 from xml import dom
 from scapy.sendrecv import sniff
 from scapy.sessions import TCPSession
 from scapy.layers.http import * # import HTTP packet
 from scapy.layers.inet import IP, TCP
-
+import pandas as pd
 from colorama import init, Fore
 from collections import Counter as cCount
 from prometheus_client import Counter, Gauge
@@ -23,6 +24,7 @@ packet_response_counts = cCount()
 http_request_proto_source_gauge = Gauge("http_request_proto_source", "Count HTTP request from source", ["method", "host"])
 http_request_proto_destination_gauge = Gauge("http_request_proto_destination", "Count HTTP request to a destination", ["method", "host", "path"])
 http_response_proto_gauge = Gauge("http_response_proto_destination", "Count HTTP  Response", ["status"])
+sniff_dt = {'ip_source': [], 'ip_destination':[], 'host': []} 
 
 def sniff_packets(iface=None):
     """
@@ -63,12 +65,15 @@ def process_packet(packet):
             if packet[HTTPRequest].Host and packet[HTTPRequest].Path:
                 host = packet[HTTPRequest].Host.decode()
                 path = packet[HTTPRequest].Path.decode()
+                sniff_dt['host'].append(host)
             else:
                 print(f'Host: {packet[HTTPRequest].Host}, path: {packet[HTTPRequest].Path}')
             
             # get the requester's IP Address
             ip_source = packet[IP].src
+            sniff_dt['ip_source'].append(ip_source)
             ip_destination = packet[IP].dst
+            sniff_dt['ip_destination'].append(ip_destination)
             # get the request method
             method = packet[HTTPRequest].Method.decode()
 
@@ -79,6 +84,9 @@ def process_packet(packet):
             packet_destination_counts.update([destination_source])
 
             print(f"\n{GREEN}[+] \{ip_source} Requested {host+path} with {method}{RESET}")
+            with open('data.json', 'w') as fp:
+                json.dump(sniff_dt, fp)
+
 
             if show_raw and packet.haslayer(Raw) and method == "POST":
                 # if show_raw flag is enabled, has raw data, and the requested method is "POST"

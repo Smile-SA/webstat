@@ -1,7 +1,5 @@
 from curses import raw
-import argparse
 import os
-import sys
 import time
 from scapy.utils import RawPcapReader
 from scapy.layers.l2 import Ether
@@ -62,16 +60,10 @@ def process_pcap(file_name):
     return df
 
 def analyze_mode(args):
-    if args.pcap != None:
-        file_name = args.pcap
-        if not os.path.isfile(file_name):
-            print('"{}" does not exist'.format(file_name),file=sys.stderr)
-            sys.exit(-1)
-
-        df = process_pcap(file_name)
-        summary_anaylyze(df)
-
-        sys.exit(0)
-    else:
-        print('pcap file is required')
+    #if args.pcap != None:
+    #    df = process_pcap(file_name)
+    while True:
+        summary_anaylyze()
+        time.sleep(2)
+        os.system('clear')
 

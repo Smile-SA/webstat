@@ -8,7 +8,6 @@ import pandas as pd
 from colorama import init, Fore
 from collections import Counter as cCount
 from prometheus_client import Counter, Gauge
-import sys
 
 # initialize colorama
 init()
@@ -101,12 +100,6 @@ def process_packet(packet):
 
 
 def sniff_mode(arg):
-    # show_raw = args.show_raw
-
-    #Write output to file
-    if arg.output != None:
-
-        sys.stdout = open('requests.txt', 'w')
-
 
     sniff_packets(arg.iface)
+    os.remove("data.json")

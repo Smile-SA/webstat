@@ -21,10 +21,17 @@ def http_analyze(df):
 
 
 def summary_anaylyze():
+    try:
+        with open("data.json", "r") as json_file:
+            my_dict = json.load(json_file)
+            sniff_df = pd.DataFrame.from_dict(my_dict).rename(columns = {'ip_source':'IP_SOURCE','host':'DOMAIN'})
+            
+            sniff_df_sorted = sniff_df.groupby(['IP_SOURCE','DOMAIN'])['DOMAIN'].count().reset_index(name='HITS').sort_values(['HITS'], ascending=False)
+            sniff_df_sorted.index += 1
+            return sniff_df_sorted
+
+    except Exception as e:
+        print('No curl requests so far, Check if sniff mode is running' )
+  
     
-    with open("data.json", "r") as json_file:
-        my_dict = json.load(json_file)
-        sniff_df = pd.DataFrame.from_dict(my_dict).rename(columns = {'ip_source':'IP_SOURCE','host':'DOMAIN'})
-        
-        sniff_df_sorted = sniff_df.groupby(['IP_SOURCE','DOMAIN'])['DOMAIN'].count().reset_index(name='HITS').sort_values(['HITS'], ascending=False)
-        print(sniff_df_sorted.set_index('IP_SOURCE')) 
+    

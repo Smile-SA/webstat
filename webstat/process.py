@@ -1,4 +1,3 @@
-from curses import raw
 import os
 import time
 from scapy.utils import RawPcapReader
@@ -6,7 +5,7 @@ from scapy.layers.l2 import Ether
 from scapy.layers.inet import IP, TCP
 from webstat.analyze import summary_anaylyze
 import pandas as pd
-
+from pytimedinput import timedInput
 
 def printable_timestamp(ts, resol):
     ts_sec = ts // resol
@@ -62,8 +61,34 @@ def process_pcap(file_name):
 def analyze_mode(args):
     #if args.pcap != None:
     #    df = process_pcap(file_name)
+    export = set()
     while True:
-        summary_anaylyze()
-        time.sleep(2)
-        os.system('clear')
+        df = summary_anaylyze()
+        print(df)
+        print(' ')
+        if len(export) == 0:
+            print("No domains have been shared so far")
+        else:
+            print('* Following domain information has been shared *')
+            print(export)
+        print('')        
 
+        if os.path.exists("data.json"):
+            userText, timedOut = timedInput("Enter Index To Share Domain:")
+        else:
+            time.sleep(5)
+            continue
+        
+        if(timedOut):
+            pass
+        else:
+            extract = df.filter(items = [int(userText)], axis=0)
+            if extract['DOMAIN'].values[0] in export:
+                print('')
+                print('Domain Already Shared')
+                print('Ignoring input in 3')
+                time.sleep(3)
+            else:
+                extract.to_csv(r'extract.txt', header=False, index=None, sep='\t', mode='a')
+                export.update(extract['DOMAIN'])        
+        os.system('clear')

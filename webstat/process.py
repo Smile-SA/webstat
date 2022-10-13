@@ -1,9 +1,9 @@
+from webstat.analyze import summary_anaylyze
 import os
 import time
 from scapy.utils import RawPcapReader
 from scapy.layers.l2 import Ether
 from scapy.layers.inet import IP, TCP
-from webstat.analyze import summary_anaylyze
 import pandas as pd
 from pytimedinput import timedInput
 

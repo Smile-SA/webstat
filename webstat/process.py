@@ -13,7 +13,6 @@ def printable_timestamp(ts, resol):
     ts_sec_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(ts_sec))
     return '{}.{}'.format(ts_sec_str, ts_subsec)
 
-
 def process_pcap(file_name):
     print('Opening {}...'.format(file_name))
 
@@ -59,36 +58,50 @@ def process_pcap(file_name):
     return df
 
 def analyze_mode(args):
-    #if args.pcap != None:
-    #    df = process_pcap(file_name)
-    export = set()
+    #TODO: Don't drop index!
+    domains = set()
+    if not os.path.exists('export.txt'):
+        pd.DataFrame(columns=['IP_SOURCE', 'DOMAIN', 'HITS']).to_csv(r'export.txt', sep='\t', mode='w' , header=True)
+
     while True:
+        #DONE: Dropped index
         df = summary_anaylyze()
+        if df is not None:
+            df.reset_index(drop=True, inplace=True)
         print(df)
-        print(' ')
-        if len(export) == 0:
-            print("No domains have been shared so far")
+        print('')        
+
+        if not os.path.exists("export.txt"):
+            print("No domains have been shared so far")            
         else:
-            print('* Following domain information has been shared *')
-            print(export)
+            extract_pre = pd.read_csv('export.txt', delimiter = "\t")
+            if extract_pre.shape[0] < 1:
+                print("No domains have been shared so far")            
+            else:
+                print('* Following domain information has been shared *')
+                for x in extract_pre.DOMAIN.values: domains.add(x)
+                print(domains)
         print('')        
 
         if os.path.exists("data.json"):
             userText, timedOut = timedInput("Enter Index To Share Domain:")
+            if len(userText) != 0:
+                if df.iloc[int(userText)].DOMAIN in domains:
+                    print("Domain already shared, ignoring input")
+                else:
+                    domains.add(df.iloc[int(userText)].DOMAIN)
+                #TODO: check HERE IF STUCK
         else:
-            time.sleep(5)
+            time.sleep(3)
             continue
         
-        if(timedOut):
-            pass
-        else:
-            extract = df.filter(items = [int(userText)], axis=0)
-            if extract['DOMAIN'].values[0] in export:
-                print('')
-                print('Domain Already Shared')
-                print('Ignoring input in 3')
-                time.sleep(3)
-            else:
-                extract.to_csv(r'extract.txt', header=False, index=None, sep='\t', mode='a')
-                export.update(extract['DOMAIN'])        
+        extract = df[df['DOMAIN'].isin(domains)]
+        #DONE: currently, items = index numbers, replace with actual domain NAMES
+        #DONE: Find a way to read old export data
+        #DONE: Merge extract_pre with extract
+        #This merge should be performed in this particular order - to avoid mismatch with current df and past df
+        exported = extract_pre.merge(extract, on = ['IP_SOURCE', 'DOMAIN', 'HITS'], how='outer').drop('Unnamed: 0', axis=1).sort_values('HITS', ascending=False).drop_duplicates(['DOMAIN', 'IP_SOURCE']).sort_index()
+        exported.to_csv(r'export.txt', sep='\t', mode='w' , header=True)
+        
         os.system('clear')
+        #TODO:EXPORT AS JSON .TXT IS SHIT

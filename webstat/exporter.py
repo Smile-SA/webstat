@@ -35,7 +35,6 @@ class AppMetrics:
         self.current_requests.set("")
         self.pending_requests.set("")
 
-
 def main():
     """Main entry point"""
 

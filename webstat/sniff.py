@@ -1,6 +1,4 @@
-import json
-import time
-import os
+import json, time, os
 from scapy.sendrecv import sniff
 from scapy.sessions import TCPSession
 from scapy.layers.http import * # import HTTP packet
@@ -10,14 +8,13 @@ from collections import Counter as cCount
 from prometheus_client import Counter, Gauge
 import psutil
 from cryptography.fernet import Fernet
-from dotenv import load_dotenv
 
 #Importing key
-load_dotenv()
 try:
     fernet = Fernet(os.environ['WEBKEY'])
 except Exception as error:
-    print("Please export provided key to env, "  + repr(error))
+    print("Please export the provided key to env")
+    exit()
     
 #Importing ethernet ports
 addrs = psutil.net_if_addrs()
@@ -90,6 +87,8 @@ def process_packet(packet):
 
             destination_source = tuple([method, host, path])
             packet_destination_counts.update([destination_source])
+            #print(f"\n\{ip_source} Requested {host+path} with {method}")
+
             with open('.data.json', 'w') as fp:
                 json.dump(sniff_dt, fp)
             

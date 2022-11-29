@@ -1,13 +1,20 @@
-import os
 from setuptools import setup
-#from nvpy import nvpy
+_requirements = [
+  "scapy==2.4.5",
+  "pandas",
+  "prometheus-client==0.15.0",
+  "psutil"  
+  ]
+
 setup(name='webstat',
-      version='1.0',
-      description='This module enables users to inspect network data',
+      version='2.4',
+      description='This module enables users to inspect and export network data',
       author='Team R&D - SMILE',
-      author_email='hongphuc.vu@smile.fr',
+      author_email='saifuddin.mohammad@smile.fr',
       url='https://git.rnd.alterway.fr/overboard/ene5ai/ene5ai-project/',
-      install_requires=['scapy==2.4.5','numpy==1.23.1', "pandas==1.4.3", "prometheus-client==0.14.1", "pytimedinput==2.0.1"],  
+      python_requires= ">=3.6 , <4.0",
+      install_requires=_requirements,  
+      keywords = ['webstat', 'network'],
       packages=['webstat'],
        license = "BSD",
       entry_points = {

@@ -1,11 +1,9 @@
 from webstat.analyze import summary_anaylyze, encrypt
-import os
-import time
+import os, sys, select, time
 from scapy.utils import RawPcapReader
 from scapy.layers.l2 import Ether
 from scapy.layers.inet import IP, TCP
 import pandas as pd
-from pytimedinput import timedInput
 
 def process_pcap(file_name):
     print('Opening {}...'.format(file_name))
@@ -78,12 +76,19 @@ def analyze_mode(args):
         print('')        
 
         if os.path.exists(".data.json"):
-            userText, timedOut = timedInput("Enter Index To Share Domain:")
-            if len(userText) != 0:
-                if df.iloc[int(userText)].DOMAIN in domains:
-                    print("Domain already shared, ignoring input")
-                else:
-                    domains.add(df.iloc[int(userText)].DOMAIN)
+            print("Enter Index To Share Domain:")
+            i, o, e = select.select( [sys.stdin], [], [], 1 )
+            if (i):
+                userText = sys.stdin.readline().strip()
+                if userText:
+                    if len(userText) > 1 or int(userText) >= len(df):
+                        print("Enter a valid index")
+                        time.sleep(2)
+                    elif df.iloc[int(userText)].DOMAIN in domains:
+                        print("Domain already shared, ignoring input")
+                        time.sleep(2)
+                    else:
+                        domains.add(df.iloc[int(userText)].DOMAIN)
         else:
             time.sleep(3)
             continue

@@ -1,8 +1,7 @@
 from prometheus_client import start_http_server, Summary
 from prometheus_client import start_http_server, Gauge
 from prometheus_client import Counter
-import time
-import os
+import time, os
 
 class AppMetrics:
     """

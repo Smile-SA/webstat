@@ -1,0 +1,6 @@
+[webstat-ppa]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~rnd-smile/ubuntu/
+login = anonymous
+allow_unsigned_uploads = 0

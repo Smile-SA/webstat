@@ -7,7 +7,7 @@ _requirements = [
   ]
 
 setup(name='webstat',
-      version='2.4',
+      version='2.5',
       description='This module enables users to inspect and export network data',
       author='Team R&D - SMILE',
       author_email='saifuddin.mohammad@smile.fr',

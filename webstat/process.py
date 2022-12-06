@@ -53,7 +53,7 @@ def analyze_mode(args):
     #TODO: Don't drop index!
     domains = set()
     if not os.path.exists('export.txt'):
-        pd.DataFrame(columns=['IP_SOURCE', 'DOMAIN', 'HITS']).to_csv(r'export.txt', sep='\t', mode='w' , header=True)
+        pd.DataFrame(columns=['IP_SOURCE', 'DOMAIN', 'PATH', 'HITS']).to_csv(r'export.txt', sep='\t', mode='w' , header=True)
 
     while True:
         df = summary_anaylyze()
@@ -95,7 +95,7 @@ def analyze_mode(args):
 
         extract = df[df['DOMAIN'].isin(domains)]
         #This merge should be performed in this particular order - to avoid mismatch with current df and past df
-        exported = extract_pre.merge(extract, on = ['IP_SOURCE', 'DOMAIN', 'HITS'], how='outer').drop('Unnamed: 0', axis=1).sort_values('HITS', ascending=False).drop_duplicates(['DOMAIN', 'IP_SOURCE']).sort_index()
+        exported = extract_pre.merge(extract, on = ['IP_SOURCE', 'DOMAIN', 'PATH', 'HITS'], how='outer').drop('Unnamed: 0', axis=1).sort_values('HITS', ascending=False).drop_duplicates(['DOMAIN', 'IP_SOURCE']).sort_index()
         exported.to_csv(r'export.txt', sep='\t', mode='w' , header=True)
         
         os.system('clear')

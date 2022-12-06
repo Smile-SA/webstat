@@ -26,7 +26,7 @@ packet_response_counts = cCount()
 http_request_proto_source_gauge = Gauge("http_request_proto_source", "Count HTTP request from source", ["method", "host"])
 http_request_proto_destination_gauge = Gauge("http_request_proto_destination", "Count HTTP request to a destination", ["method", "host", "path"])
 http_response_proto_gauge = Gauge("http_response_proto_destination", "Count HTTP  Response", ["status"])
-sniff_dt = {'ip_source': [], 'ip_destination':[], 'host': []} #}, 'access_time': []} 
+sniff_dt = {'ip_source': [], 'ip_destination':[], 'host': [], 'path': []} #}, 'access_time': []} 
 
 def sniff_packets(iface=None):
     """
@@ -68,6 +68,8 @@ def process_packet(packet):
                 host = packet[HTTPRequest].Host.decode()
                 path = packet[HTTPRequest].Path.decode()
                 sniff_dt['host'].append(host)
+                sniff_dt['path'].append(path)
+
             else:
                 print(f'Host: {packet[HTTPRequest].Host}, path: {packet[HTTPRequest].Path}')
             

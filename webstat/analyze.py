@@ -26,8 +26,8 @@ def summary_anaylyze():
         #TODO: Memory optimisation
         with open(".data.json", "r") as json_file:
             my_dict = json.load(json_file)     
-            sniff_df = pd.DataFrame.from_dict(my_dict).rename(columns = {'ip_source':'IP_SOURCE','host':'DOMAIN'})
-            sniff_df_sorted = sniff_df.groupby(['IP_SOURCE','DOMAIN'])['DOMAIN'].count().reset_index(name='HITS').sort_values(['HITS'], ascending=False)
+            sniff_df = pd.DataFrame.from_dict(my_dict).rename(columns = {'ip_source':'IP_SOURCE','host':'DOMAIN', 'path':'PATH'})
+            sniff_df_sorted = sniff_df.groupby(['IP_SOURCE','DOMAIN','PATH'])['DOMAIN'].count().reset_index(name='HITS').sort_values(['HITS'], ascending=False)
             return sniff_df_sorted
     except Exception as e:
         print('No requests so far, please try again later')

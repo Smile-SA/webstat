@@ -1,45 +1,19 @@
-<div align="center" id="top"> 
-  <img src="./.github/app.gif" alt="Ene5ai Project" />
-
-  &#xa0;
-
-  <!-- <a href="https://ene5aiproject.netlify.app">Demo</a> -->
-</div>
-
-<h1 align="center">Ene5ai Project</h1>
-
-
-
-<!-- Status -->
-
-<!-- <h4 align="center"> 
-	🚧  Ene5ai Project 🚀 Under construction...  🚧
-</h4> 
-
-<hr> -->
-
-<p align="center">
-  <a href="#dart-about">About</a> &#xa0; | &#xa0; 
-  <a href="#sparkles-features">Features</a> &#xa0; | &#xa0;
-  <a href="#rocket-technologies">Technologies</a> &#xa0; | &#xa0;
-  <a href="#white_check_mark-requirements">Requirements</a> &#xa0; | &#xa0;
-  <a href="#checkered_flag-starting">Starting</a> &#xa0; | &#xa0;
-  <a href="#memo-license">License</a> &#xa0; | &#xa0;
-  <a href="https://github.com/{{YOUR_GITHUB_USERNAME}}" target="_blank">Author</a>
-</p>
-
+ <h1 align="center">Ene5ai Project</h1>
 <br>
 
 ## About ##
 
-This module enables users to inspect network data and export the transform collected metrics via an API. The exposed metrics is compatible with Prometheus. It provides 2 modes: Sniff and Analyze, users can choose which suits them best. The Analyze mode will provide a report of network data provided by a input file while Sniff mode will inspect network package exchanged in real time and exposed timeseries metrics using Prometheus client API.
+This python module wrapped in a debian package enables users to inspect and export the http traffic. 
+
+It provides 2 modes: Sniff and Analyze, users can choose which suits them best. The Analyze mode will provide an interactive terminal where the user can choose and export a report of http traffic while Sniff mode will inspect the traffic in real time and expose them to prometheus so the data can be analyzed in time series database.
+
 ## Features ##
 
 **Sniff mode:**\
-Inspects network package, aggregates them expose it on port 8000. The exposed metrics will be consumed by the node-exporter, it is a good idea to run this in background.
+Inspects http data, aggregates them and exposes it on port 8000. The exposed metrics will be consumed by prometheus, it is a good idea to run this in background.
 
 **Analyze mode:**\
-Opens an interactive terminal with a real-time network activity report. User can choose which domain information to be stored.
+Opens an interactive terminal with a real-time network activity report. User can choose which domain information to be exported.
 
 ## Technologies ##
 
@@ -79,8 +53,9 @@ $ sudo webstat -m analyze
 
 This project is under license from MIT. For more details, see the [LICENSE](LICENSE.md) file.
 
+## Credits
 
-Made with :heart: by <a href="https://github.com/{{YOUR_GITHUB_USERNAME}}" target="_blank">{{Team R&D at Smile}}</a>
+- Rnd Team @ Smile
 
 &#xa0;
 

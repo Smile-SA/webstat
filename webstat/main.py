@@ -2,6 +2,7 @@ from webstat.process import analyze_mode
 from webstat.sniff import sniff_mode
 from prometheus_client import start_http_server
 import argparse
+import sys
 
 def main():
     parser = argparse.ArgumentParser()
@@ -18,4 +19,10 @@ def main():
         sniff_mode(args)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        try:
+            sys.exit(130)
+        except SystemExit:
+            os._exit(130)

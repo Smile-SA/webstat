@@ -1,0 +1,11 @@
+Package: python3-webstat
+Source: webstat
+Version: 2.9.1-1
+Architecture: all
+Maintainer: Team R&D - SMILE <saifuddin.mohammad@smile.fr>
+Installed-Size: 38
+Depends: python3-pandas, python3-prometheus-client, python3-psutil, python3-scapy, python3:any
+Section: python
+Priority: optional
+Homepage: https://git.rnd.alterway.fr/overboard/ene5ai/ene5ai-project/
+Description: This module enables users to inspect and export network data

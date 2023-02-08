@@ -1,0 +1,3 @@
+[console_scripts]
+webstat = webstat.main:main
+

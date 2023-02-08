@@ -1,0 +1,13 @@
+Source: webstat
+Maintainer: Team R&D - SMILE <saifuddin.mohammad@smile.fr>
+Section: python
+Priority: optional
+Build-Depends: dh-python, python3-setuptools, python3-all, debhelper (>= 9), dh-python
+Standards-Version: 3.9.6
+Homepage: https://git.rnd.alterway.fr/overboard/ene5ai/ene5ai-project/
+
+Package: python3-webstat
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}
+Description: This module enables users to inspect and export network data
+

@@ -1,0 +1,28 @@
+Format: 1.8
+Date: Wed, 08 Feb 2023 14:56:52 +0000
+Source: webstat
+Architecture: source
+Version: 2.9.1-1
+Distribution: jammy
+Urgency: low
+Maintainer: Team R&D - SMILE <saifuddin.mohammad@smile.fr>
+Changed-By: Team R&D - SMILE <saifuddin.mohammad@smile.fr>
+Changes:
+ webstat (2.9.1-1) jammy; urgency=low
+ .
+   * source package automatically created by stdeb 0.8.5
+Checksums-Sha1:
+ 1617a436af54198c87c13191abb7643451fc664b 906 webstat_2.9.1-1.dsc
+ 676096e58afc9eb00492de6eac8a2b9c792bae9d 6928 webstat_2.9.1.orig.tar.gz
+ 286799bfe2757f4be66e00e9ecfa43a90376d8ca 924 webstat_2.9.1-1.debian.tar.xz
+ 92618a2824f6e58e7428b6cfe700967be6c17fd6 6182 webstat_2.9.1-1_source.buildinfo
+Checksums-Sha256:
+ 1fc6084c2b452ff3589be8fa73d3bc1f5b5320fe8302d0163bcf3de0f6b85c15 906 webstat_2.9.1-1.dsc
+ 670fc333bd44aa5d011ec711a1b6d23976a18af915b2f41d46cd764d1e0d2880 6928 webstat_2.9.1.orig.tar.gz
+ b6f57b26d39188230832f52e54e52ac7745e54a65d8c34d8c5aea2729dce076c 924 webstat_2.9.1-1.debian.tar.xz
+ 2d59a152d21d785fe1f495fd201e21e652d4860b885be2f2604cd0f04c901fd6 6182 webstat_2.9.1-1_source.buildinfo
+Files:
+ 4813d133683f0e3beb6f3fb3e8139fc8 906 python optional webstat_2.9.1-1.dsc
+ 6a5d9a7d0a09c2a6614d920b81444ed2 6928 python optional webstat_2.9.1.orig.tar.gz
+ cc5265931d16acc129e9f438df4dec64 924 python optional webstat_2.9.1-1.debian.tar.xz
+ 651325a77bac54f18ab591a224adcdc7 6182 python optional webstat_2.9.1-1_source.buildinfo

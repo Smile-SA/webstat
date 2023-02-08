@@ -1,0 +1,15 @@
+README.md
+setup.py
+webstat.desktop
+webstat/__init__.py
+webstat/analyze.py
+webstat/exporter.py
+webstat/main.py
+webstat/process.py
+webstat/sniff.py
+webstat.egg-info/PKG-INFO
+webstat.egg-info/SOURCES.txt
+webstat.egg-info/dependency_links.txt
+webstat.egg-info/entry_points.txt
+webstat.egg-info/requires.txt
+webstat.egg-info/top_level.txt

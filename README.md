@@ -37,7 +37,7 @@ Before running webstat, it is mandatory that the user exports a key to the envir
 This is to ensure that the sniffed data is encrypted
 ```bash
 # Insert key here: 
-$ sudo vim etc/environment
+$ sudo vim /etc/environment
 WEBKEY="qZeyg1YpD4l9oCjPEq2yXbkEqmK_LF2-WLw_j3pe7RM="
 
 # Launch Sniff Mode

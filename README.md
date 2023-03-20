@@ -15,14 +15,16 @@ Inspects http data, aggregates them and exposes it on port 8000. The exposed met
 **Analyze mode:**\
 Opens an interactive terminal with a real-time network activity report. User can choose which domain information to be exported.
 
-## Technologies ##
 
-The following tools were used in this project:
+## Dependencies ##
 
-- [Python](https://www.python.org/)
-- [stdeb](https://pypi.org/project/stdeb/)
-- [Scapy](https://pypi.org/project/scapy/)
-- [Prometheus](https://pypi.org/project/prometheus/)
+These dependencies are automatically managed via setup tools
+
+- [scapy](https://pypi.org/project/scapy/)
+- [pandas](https://pypi.org/project/pandas/)
+- [prometheus-client==0.15.0](https://pypi.org/project/prometheus/)
+- [psutil](https://pypi.org/project/psutil/)  
+
 
 ## Installation ##
 

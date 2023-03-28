@@ -1,4 +1,0 @@
-pandas
-prometheus-client==0.15.0
-psutil
-scapy==2.4.5

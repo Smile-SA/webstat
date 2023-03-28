@@ -28,33 +28,29 @@ http_request_proto_destination_gauge = Gauge("http_request_proto_destination", "
 http_response_proto_gauge = Gauge("http_response_proto_destination", "Count HTTP  Response", ["status"])
 sniff_dt = {'ip_source': [], 'ip_destination':[], 'host': [], 'path': []} #}, 'access_time': []} 
 
-def sniff_packets(iface=None):
+def sniff_packets(iface=None,show_raw=False):
     """
     Sniff 80 port packets with `iface`, if None (default), then the
     Scapy's default interface is used
     """
     if iface == None:
         iface = [*addrs.keys()][1]
-    if iface:
+    else: 
+        iface = iface
         # port 80 for http (generally)
-        # `process_packet` is the callback
-        
-        while True:
-            sniff(filter="port 80", prn=process_packet, iface=iface, session=TCPSession, store=False, timeout=10)
-            # print("Reset cycle")
-            for k, v in packet_source_counts.items():
-                http_request_proto_source_gauge.labels(method=k[0], host=k[1]).set(v)
+        # `process_packet` is the callback 
+    while True:
+        sniff(filter="tcp port 80 or tcp port 443", prn=lambda packet: process_packet(packet, show_raw=show_raw), iface=iface, session=TCPSession, store=False, timeout=10)
+        # print("Reset cycle")
+        for k, v in packet_source_counts.items():
+            http_request_proto_source_gauge.labels(method=k[0], host=k[1]).set(v)
+        for k, v in packet_destination_counts.items():
+            http_request_proto_destination_gauge.labels(method=k[0], host=k[1], path=k[2]).set(v)
+        for k, b in packet_response_counts.items():
+            http_response_proto_gauge.labels(status=k[0])
 
-            for k, v in packet_destination_counts.items():
-                http_request_proto_destination_gauge.labels(method=k[0], host=k[1], path=k[2]).set(v)
 
-            for k, b in packet_response_counts.items():
-                http_response_proto_gauge.labels(status=k[0])
-    else:
-        # sniff with default interface
-        sniff(filter="port 80", prn=process_packet, session=TCPSession, store=False)
-
-def process_packet(packet):
+def process_packet(packet,show_raw):
     """
     This function is executed whenever a packet is sniffed
     """
@@ -63,7 +59,6 @@ def process_packet(packet):
             host = ""
             path = ""
 
-            show_raw = True
             if packet[HTTPRequest].Host and packet[HTTPRequest].Path:
                 host = packet[HTTPRequest].Host.decode()
                 path = packet[HTTPRequest].Path.decode()
@@ -97,10 +92,9 @@ def process_packet(packet):
             # encrypting data
             encrypt('.data.json')
 
-            if show_raw and packet.haslayer(Raw) and method == "POST":
-                # if show_raw flag is enabled, has raw data, and the requested method is "POST"
-                # then show raw
-                print(f"\nSome useful Raw data: {packet[Raw].load}")
+            if show_raw:
+                pkt_str=repr(packet[HTTPRequest])
+                print(f"\nSome useful Raw data: {pkt_str}")
 
         if HTTPResponse in packet:
             status = packet[HTTPResponse].Status_Code.decode()
@@ -130,7 +124,7 @@ def decrypt(data):
         dec_file.write(decrypted)
 
 def sniff_mode(arg):
-    print('sniff mode is active and collecting domain information, it is better idea to run this in background')
+    print(f"sniff mode is active and collecting domain information from interface {arg.iface}, it is better idea to run this in background")
     print('Please proceed to analyze mode to see more information')
-    sniff_packets(arg.iface)
+    sniff_packets(arg.iface,arg.show_raw)
     os.remove(".data.json")

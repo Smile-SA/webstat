@@ -1,5 +1,5 @@
-from webstat.process import analyze_mode
-from webstat.sniff import sniff_mode
+from analyze import analyze_mode
+from sniff import sniff_mode
 from prometheus_client import start_http_server
 import argparse
 import os
@@ -12,13 +12,16 @@ def main():
     args = parser.parse_args()
 
     if args.mode != 'sniff':
+        print("Analyzing")
         try:
-            analyze_mode(args)
+            while True:
+                analyze_mode()
         except KeyboardInterrupt:
             print("\n\nExiting Analyze Mode..\n\n")
             os._exit(130)
     else:
-        try:
+        print("Sniffing")
+        try:  
             start_http_server(8000)   
             sniff_mode(args)
         except KeyboardInterrupt:

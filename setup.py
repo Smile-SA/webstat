@@ -1,14 +1,12 @@
 from setuptools import setup
 _requirements = [
-  "scapy==2.4.5",
   "pandas",
   "prometheus-client==0.15.0",
-  "psutil",
-  "cryptography"
+  "psutil"  
   ]
 
 setup(name='webstat',
-      version='2.9.2',
+      version='0.1',
       description='This module enables users to inspect and export network data',
       author='Team R&D - SMILE',
       author_email='saifuddin.mohammad@smile.fr',

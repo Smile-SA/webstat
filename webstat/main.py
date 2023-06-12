@@ -26,6 +26,7 @@ def main():
             sniff_mode(args)
         except KeyboardInterrupt:
             print("\n\nExiting Sniff Mode..\n\n")
+            os.remove('captured_urls.txt')
             os._exit(130)
 
 if __name__ == '__main__':

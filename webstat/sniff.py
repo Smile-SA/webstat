@@ -11,7 +11,9 @@ def sniff_packets(iface=None,show_raw=False):
     p = subprocess.Popen(['sudo', 'tcpdump'], stdout=subprocess.PIPE, universal_newlines=True)
 
     # Regular expression pattern for URL matching
-    url_pattern = r'Type65\?([^()]+)\('
+    url_pattern = r'(?:Type65|AAAA)\?([^\(\)]+)\('
+    
+
     #re.compile(r'\bwww.*?\.(?:fr|com|us)\b', re.IGNORECASE)
 
     # Initialize a Counter metric for URL occurrences
@@ -20,6 +22,7 @@ def sniff_packets(iface=None,show_raw=False):
     # Loop through each line of output from TCPdump
     for line in iter(p.stdout.readline, ''):
         # Find URLs matching the pattern in the line
+    #    print(line)
         matches = re.search(url_pattern, line)
         if matches:
             # Push each URL as a metric

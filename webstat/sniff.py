@@ -1,11 +1,10 @@
-import subprocess
-import re
+import subprocess, re
 from prometheus_client import Counter
 
 
 def sniff_packets(iface=None,show_raw=False):
    
-    file_path = 'captured_urls.txt'
+    file_path = 'sniffed.txt'
     file = open(file_path, 'w')
     # Run TCPdump and capture the output
     p = subprocess.Popen(['sudo', 'tcpdump'], stdout=subprocess.PIPE, universal_newlines=True)
@@ -36,12 +35,8 @@ def sniff_packets(iface=None,show_raw=False):
     # Terminate the TCPdump process
     p.terminate()
 
-    # Keep the program running to serve the metrics
-    while True:
-        pass
 
 
 def sniff_mode(arg):
     print(f"sniff mode is active and collecting domain information from interface {arg.iface}, it is better idea to run this in background")
-    print('Please proceed to analyze mode to see more information')
     sniff_packets(arg.iface,arg.show_raw)

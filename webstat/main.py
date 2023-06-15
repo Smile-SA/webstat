@@ -17,7 +17,7 @@ def main():
             sniff_thread = threading.Thread(target=sniff_analyz_mode, args=(args,))
             sniff_thread.daemon = True  # Set the thread as a daemon so it terminates when the main thread exits
             sniff_thread.start()
-            time.sleep(7)
+            time.sleep(3)
             while True:
                 analyze_mode()
         except KeyboardInterrupt:

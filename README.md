@@ -5,7 +5,7 @@
 
 This python module wrapped in a debian package enables users to inspect and export the http traffic. 
 
-It provides 2 modes: Sniff and Analyze, users can choose which suits them best. The Analyze mode will provide an interactive terminal where the user can choose and export a report of http traffic while Sniff mode will inspect the traffic in real time and expose them to prometheus so the data can be analyzed in time series database.
+It provides 2 modes: Sniff and Analyze, users can choose which suits them best. The Analyze mode will provide an interactive terminal where the user can choose and export http traffic as metrics over Prometheus, while Sniff mode will inspect entire traffic in real time and expose them to prometheus so the data can be analyzed in a time series database.
 
 ## Features ##
 
@@ -13,17 +13,14 @@ It provides 2 modes: Sniff and Analyze, users can choose which suits them best. 
 Inspects http data, aggregates them and exposes it on port 8000. The exposed metrics will be consumed by prometheus, it is a good idea to run this in background.
 
 **Analyze mode:**\
-Opens an interactive terminal with a real-time network activity report. User can choose which domain information to be exported.
+Opens an interactive terminal with a real-time network activity report. User can choose which domain information to be exported as metrics for Prometheus over port 8001.
 
 
 ## Dependencies ##
 
-These dependencies are automatically managed via setup tools
+This project mainly depends on _prometheus_client_ and is automatically managed via setup tools:
 
-- [scapy](https://pypi.org/project/scapy/)
-- [pandas](https://pypi.org/project/pandas/)
 - [prometheus-client==0.15.0](https://pypi.org/project/prometheus/)
-- [psutil](https://pypi.org/project/psutil/)  
 
 
 ## Installation ##
@@ -35,23 +32,24 @@ $ sudo apt-get install python3-webstat
 ```
 
 ## Launch ##
-Before running webstat, it is mandatory that the user exports a key to the environment\
-This is to ensure that the sniffed data is encrypted
-```bash
-# Insert key here: 
-$ sudo vim /etc/environment
-WEBKEY=<YOUR_SECRET_KEY>
 
+```bash
 # Launch Sniff Mode
 $ sudo webstat -m sniff
+# Sniff mode will enable all metrics on <http://localhost:8000/metrics>
 
 # Launch Analyze Mode 
 $ sudo webstat -m analyze
-
-# Sniff mode will enable all metrics on <http://localhost:8000/metrics>, which can further be added as a Prometheus target
+# Analyze mode will enable user selected metrics on <http://localhost:8001/metrics>
 
 ```
+These metrics can be added to prometheus as tragets.
 
+## Uninstallation ##
+
+```bash
+sudo apt-get purge --auto-remove python3-webstat
+```
 ## License ##
 
 This project is under license from MIT. For more details, see the [LICENSE](LICENSE.md) file.

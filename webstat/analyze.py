@@ -9,6 +9,9 @@ with open(extract_file_path, "w") as file:
     pass
 
 def read_extract_file():
+    # Clear the existing metrics
+    url_counter.clear()
+
     with open(extract_file_path, 'r') as extract_file:
         lines = extract_file.readlines()[1:]  # Skip the header line
         for line in lines:

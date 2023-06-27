@@ -8,7 +8,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mode", help="Select Mode", required=True)
     parser.add_argument("-i", "--iface", help="Interface to use, default is scapy's default interface")
-    parser.add_argument("-r", "--show_raw", dest="show_raw", action="store_true", help="Whether to print POST raw data, such as passwords, search queries, etc.")
     args = parser.parse_args()
 
     if args.mode == 'analyze':
@@ -17,7 +16,7 @@ def main():
             sniff_thread = threading.Thread(target=sniff_analyz_mode, args=(args,))
             sniff_thread.daemon = True  # Set the thread as a daemon so it terminates when the main thread exits
             sniff_thread.start()
-            time.sleep(7)
+            time.sleep(3)
             while True:
                 analyze_mode()
         except KeyboardInterrupt:

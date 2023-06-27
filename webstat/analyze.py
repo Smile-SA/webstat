@@ -1,13 +1,24 @@
-import subprocess, re, time
-from prometheus_client import Counter, Summary
+import subprocess,re, time
+from prometheus_client import Counter
 
 file_path = 'analyzed.txt'
 extract_file_path = 'extract.txt'
 extract_data = []  # Initialize an empty list for extraction
-extracted_url_metrics = {}
+url_counter = Counter('extracted_url_access_count', 'Number of times a URL is accessed', ['url'])
+with open(extract_file_path, "w") as file:
+    pass
 
-def sniff_packets(iface=None, show_raw=False):
-    file_path = 'analyzed.txt'
+def read_extract_file():
+    with open(extract_file_path, 'r') as extract_file:
+        lines = extract_file.readlines()[1:]  # Skip the header line
+        for line in lines:
+            line_parts = line.strip().split('\t')
+            if len(line_parts) == 3:
+                url = line_parts[1].strip()
+                hits = int(line_parts[2].strip())
+                url_counter.labels(url).inc(hits)
+
+def sniff_packets(iface=None):
     file = open(file_path, 'w')
 
     # Run TCPdump and capture the output
@@ -18,7 +29,6 @@ def sniff_packets(iface=None, show_raw=False):
 
     # Loop through each line of output from TCPdump
     for line in iter(p.stdout.readline, ''):
-        print(line)
         # Find the time and URLs matching the pattern in the line
         matches = re.search(url_pattern, line)
         if matches:
@@ -37,19 +47,17 @@ def sniff_packets(iface=None, show_raw=False):
             file.write(f"{url},{timestamp}\n")
             file.flush()
 
-            # Increment the URL count and the corresponding Summary metric
-            if url in extracted_url_metrics:
-                extracted_url_metrics[url].observe(1)
-
     # Terminate the TCPdump process
     p.terminate()
 
 def sniff_analyz_mode(arg):
     print(f"Sniff mode is active and collecting domain information from interface {arg.iface}")
     print('Proceeding to analyze mode in 3 seconds...')
-    sniff_packets(arg.iface, arg.show_raw)
+    sniff_packets(arg.iface)
 
 def analyze_mode():
+
+    read_extract_file()
     global extract_data
 
     try:
@@ -99,9 +107,6 @@ def analyze_mode():
                 if selected_domains:
                     existing_domains = set([item[0] for item in extract_data])
                     new_domains = [item for item in selected_domains if item[0] not in existing_domains]
-                    for index, (domain, hits) in enumerate(selected_domains, start=1):
-                        metric_name = f"extracted_url_access_count_{index}"
-                        # extracted_url_metrics[domain] = Summary(metric_name, f"Number of times {domain} is accessed")
 
                     if new_domains:
                         extract_data.extend(new_domains)
@@ -111,6 +116,7 @@ def analyze_mode():
                             for index, (domain, hits) in enumerate(extract_data, start=1):
                                 file.write(f"{str(index)}\t{domain}\t{str(hits)}\n")
                         print("Data extracted to 'extract.txt'")
+  
                     else:
                         print("Input domain already exists. Data not extracted.")
                 else:
@@ -125,11 +131,7 @@ def analyze_mode():
                 domain = list(aggregated_counts.keys())[selected_index - 1]
                 hits = list(aggregated_counts.values())[selected_index - 1]
                 if domain not in extract_data:
-                    metric_name = f"{domain}_access_count"
-                    # extracted_url_metrics[domain] = Summary(metric_name, f"Number of times {domain} is accessed")
-
                     extract_data.append((domain, hits))
-
                     with open(extract_file_path, 'a') as file:
                         file.write(f"{str(len(extract_data))}\t{domain}\t{str(hits)}\n")
                     print("Data extracted to 'extract.txt'")
@@ -247,7 +249,3 @@ def display_subdomains(domain):
         print("No subdomains found containing the domain.")
 
     time.sleep(1)
-
-
-for metric in extracted_url_metrics.values():
-    metric.collect()

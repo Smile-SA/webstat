@@ -2,7 +2,7 @@ import subprocess, re
 from prometheus_client import Counter
 
 
-def sniff_packets(iface=None,show_raw=False):
+def sniff_packets(iface=None):
    
     file_path = 'sniffed.txt'
     file = open(file_path, 'w')
@@ -11,8 +11,6 @@ def sniff_packets(iface=None,show_raw=False):
 
     # Regular expression pattern for URL matching
     url_pattern = r'(?:Type65|AAAA)\?([^\(\)]+)\('
-    
-
     #re.compile(r'\bwww.*?\.(?:fr|com|us)\b', re.IGNORECASE)
 
     # Initialize a Counter metric for URL occurrences
@@ -39,4 +37,4 @@ def sniff_packets(iface=None,show_raw=False):
 
 def sniff_mode(arg):
     print(f"sniff mode is active and collecting domain information from interface {arg.iface}, it is better idea to run this in background")
-    sniff_packets(arg.iface,arg.show_raw)
+    sniff_packets(arg.iface)

@@ -1,20 +1,18 @@
- <h1 align="center">Ene5ai Project</h1>
-<br>
+# Webstat
 
 ## About ##
 
-This python module wrapped in a debian package enables users to inspect and export the http traffic. 
+This python module wrapped in a debian package enables users to inspect and export their http traffic. 
 
-It provides 2 modes: Sniff and Analyze, users can choose which suits them best. The Analyze mode will provide an interactive terminal where the user can choose and export http traffic as metrics over Prometheus, while Sniff mode will inspect entire traffic in real time and expose them to prometheus so the data can be analyzed in a time series database.
+It provides 2 modes: Sniff and Analyze. The Analyze mode will provide an interactive terminal where the user can choose and export http traffic as metrics over Prometheus, while Sniff mode will inspect entire traffic in real time and expose it as metrics to prometheus. In the first case, users have full control over the data they want to share, in the second, extraction and metrics retrieval is automated.
 
 ## Features ##
 
-**Sniff mode:**\
+**Sniff mode:**
 Inspects http data, aggregates them and exposes it on port 8000. The exposed metrics will be consumed by prometheus, it is a good idea to run this in background.
 
-**Analyze mode:**\
+**Analyze mode:**
 Opens an interactive terminal with a real-time network activity report. User can choose which domain information to be exported as metrics for Prometheus over port 8001.
-
 
 ## Dependencies ##
 
@@ -41,11 +39,11 @@ $ sudo webstat -m sniff
 # Launch Analyze Mode 
 $ sudo webstat -m analyze
 # Analyze mode will enable user selected metrics on <http://localhost:8001/metrics>
-
 ```
+
 These metrics can be added to prometheus as tragets.
 
-## Uninstallation ##
+## Remove Webstat ##
 
 ```bash
 sudo apt-get purge --auto-remove python3-webstat
@@ -56,8 +54,6 @@ This project is under license from MIT. For more details, see the [LICENSE](LICE
 
 ## Credits
 
+- Saifuddin Mohammad
+- Hong Nphuc Vu
 - Rnd Team @ Smile
-
-&#xa0;
-
-<a href="#top">Back to top</a>

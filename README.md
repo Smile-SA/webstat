@@ -16,10 +16,11 @@ Opens an interactive terminal with a real-time network activity report. User can
 
 ## Dependencies ##
 
-This project mainly depends on _prometheus_client_ and is automatically managed via setup tools:
+This project mainly depends on [prometheus-client==0.15.0](https://pypi.org/project/prometheus/) 
 
-- [prometheus-client==0.15.0](https://pypi.org/project/prometheus/)
-
+```bash
+$ pip3 install prometheus_client==0.15.0 
+```
 
 ## Installation ##
 
@@ -41,7 +42,7 @@ $ sudo webstat -m analyze
 # Analyze mode will enable user selected metrics on <http://localhost:8001/metrics>
 ```
 
-These metrics can be added to prometheus as tragets.
+These metrics can be added to prometheus as targets.
 
 ## Remove Webstat ##
 
@@ -55,5 +56,5 @@ This project is under license from MIT. For more details, see the [LICENSE](LICE
 ## Credits
 
 - Saifuddin Mohammad
-- Hong Nphuc Vu
+- Hong Phuc VU
 - Rnd Team @ Smile

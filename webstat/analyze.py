@@ -13,7 +13,7 @@ def read_extract_file():
     url_counter.clear()
 
     with open(extract_file_path, 'r') as extract_file:
-        lines = extract_file.readlines()[1:]  # Skip the header line
+        lines = extract_file.readlines()
         for line in lines:
             line_parts = line.strip().split('\t')
             if len(line_parts) == 3:

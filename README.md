@@ -44,6 +44,36 @@ $ sudo webstat -m analyze
 
 These metrics can be added to prometheus as targets.
 
+## Prometheus Integration ##
+
+```yaml
+# Install Prometheus
+$ sudo apt install -y prometheus
+```
+
+```bash
+# Configure prometheus to listen to webstat
+$ sudo nano /etc/prometheus/prometheus.yml
+```
+
+Add the following lines under the scrape_configs section:
+```yaml
+scrape_configs:
+  - job_name: 'sniff-mode'
+    static_configs:
+      - targets: ['localhost:8000']
+  - job_name: 'analyze-mode'
+    static_configs:
+      - targets: ['localhost:8001']
+```
+
+```bash
+# Restart prometheus
+$ sudo systemctl restart prometheus
+```
+
+We can now access the Prometheus UI by visiting http://localhost:9090 in any web browser. From there, we can view real time http activity.
+
 ## Remove Webstat ##
 
 ```bash

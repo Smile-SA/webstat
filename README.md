@@ -26,8 +26,8 @@ $ pip3 install prometheus_client==0.15.0
 
 ```bash
 $ sudo add-apt-repository ppa:rnd-smile/webstat
-$ sudo apt-get update && sudo apt-get upgrade
-$ sudo apt-get install python3-webstat
+$ sudo apt update && sudo apt upgrade
+$ sudo apt install python3-webstat
 ```
 
 ## Launch ##
@@ -77,7 +77,7 @@ We can now access the Prometheus UI by visiting http://localhost:9090 in any web
 ## Remove Webstat ##
 
 ```bash
-sudo apt-get purge --auto-remove python3-webstat
+sudo apt purge --auto-remove python3-webstat
 ```
 ## License ##
 

@@ -1,4 +1,5 @@
 import subprocess, re
+import sys
 from prometheus_client import Counter
 
 

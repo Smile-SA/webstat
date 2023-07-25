@@ -14,12 +14,17 @@ def read_extract_file():
 
     with open(extract_file_path, 'r') as extract_file:
         lines = extract_file.readlines()
+        # Skip the header line
+        lines = lines[1:]
         for line in lines:
             line_parts = line.strip().split('\t')
             if len(line_parts) == 3:
                 url = line_parts[1].strip()
-                hits = int(line_parts[2].strip())
-                url_counter.labels(url).inc(hits)
+                hits = line_parts[2].strip()
+                if hits.isdigit():
+                    hits = int(hits)
+                    url_counter.labels(url).inc(hits)
+
 
 def sniff_packets(iface=None):
     file = open(file_path, 'w')

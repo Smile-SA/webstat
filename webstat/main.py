@@ -7,7 +7,6 @@ import argparse, os, threading, time
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mode", help="Select Mode", required=True)
-    parser.add_argument("-i", "--iface", help="Interface to use, default is scapy's default interface")
     args = parser.parse_args()
 
     if args.mode == 'analyze':
@@ -20,7 +19,8 @@ def main():
             while True:
                 analyze_mode()
         except KeyboardInterrupt:
-            print("\n\nExiting Analyze Mode..\n\n")
+            print("\n\nExiting Analyze Mode..\n")
+            print("\nDomain information extracted to extract.txt\n")
             os._exit(130)
     else:
         try:  

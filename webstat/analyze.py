@@ -1,7 +1,7 @@
 import subprocess,re, time
 from prometheus_client import Counter
 
-file_path = 'analyzed.txt'
+file_path = '.analyzed.txt'
 extract_file_path = 'extract.txt'
 extract_data = []  # Initialize an empty list for extraction
 url_counter = Counter('extracted_url_access_count', 'Number of times a URL is accessed', ['url'])
@@ -26,7 +26,7 @@ def read_extract_file():
                     url_counter.labels(url).inc(hits)
 
 
-def sniff_packets(iface=None):
+def sniff_packets():
     file = open(file_path, 'w')
 
     # Run TCPdump and capture the output
@@ -59,9 +59,9 @@ def sniff_packets(iface=None):
     p.terminate()
 
 def sniff_analyz_mode(arg):
-    print(f"Sniff mode is active and collecting domain information from interface {arg.iface}")
+    print(f"Sniff mode is active and collecting HTTP information from network interface")
     print('Proceeding to analyze mode in 3 seconds...')
-    sniff_packets(arg.iface)
+    sniff_packets()
 
 def analyze_mode():
 
@@ -104,7 +104,7 @@ def analyze_mode():
         print(output_table)
 
         # Prompt the user for extraction option
-        extraction_option = input("Select extraction option: [e] Substring-based, [i] Index-based, [d] Display domains, [c] Quit: ")
+        extraction_option = input("Select extraction option: [e] Substring-based, [i] Index-based, [d] Display domains, [Enter] Refresh: ")
         
         if extraction_option.lower() == 'e':
             selected_text = input("Enter the text to extract domains (e.g., smile, google): ")

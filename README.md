@@ -16,11 +16,7 @@ Opens an interactive terminal with a real-time network activity report. User can
 
 ## Dependencies ##
 
-This project mainly depends on [prometheus-client==0.15.0](https://pypi.org/project/prometheus/) 
-
-```bash
-$ pip3 install prometheus_client==0.15.0 
-```
+This project mainly depends on [prometheus-client==0.15.0](https://pypi.org/project/prometheus/) and is automatically managed by webstat.
 
 ## Installation ##
 

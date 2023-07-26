@@ -1,9 +1,8 @@
 import subprocess, re
-import sys
 from prometheus_client import Counter
 
 
-def sniff_packets(iface=None):
+def sniff_packets():
    
     file_path = 'sniffed.txt'
     file = open(file_path, 'w')
@@ -37,5 +36,5 @@ def sniff_packets(iface=None):
 
 
 def sniff_mode(arg):
-    print(f"sniff mode is active and collecting domain information from interface {arg.iface}, it is better idea to run this in background")
-    sniff_packets(arg.iface)
+    print(f"Sniff mode is active and collecting HTTP information from network interface, it is better idea to run this in background")
+    sniff_packets()

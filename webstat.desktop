@@ -6,7 +6,7 @@ Comment=Minimal stdeb example
 # myscript should wait for user input at the end, else the terminal
 # window will disappear immediately.
 Exec=webstat
-Icon=/home/smohammad/Downloads/Icon-icon.png
+#Icon=
 Categories=Utility;
 # desktop should run this in a terminal application
 Terminal=true

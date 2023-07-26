@@ -1,15 +1,21 @@
-from setuptools import setup
+from setuptools import setup, find_packages
+
+exclude_modules = []
+try:
+    import prometheus_client.twisted
+except ImportError:
+    exclude_modules.append('prometheus_client.twisted')
 
 setup(
     name='webstat',
-    version='0.2.8.4',
+    version='0.2.9.9.2',
     description='This module enables users to inspect and export network data',
     author='Team R&D - SMILE',
     author_email='saifuddin.mohammad@smile.fr',
     url='https://git.rnd.alterway.fr/overboard/ene5ai/ene5ai-project/',
     python_requires=">=3.10",
     keywords=['webstat', 'network'],
-    packages=['webstat'],
+    packages=find_packages(exclude=exclude_modules),
     license="BSD",
     entry_points={
         'console_scripts': ['webstat=webstat.main:main']
@@ -17,4 +23,5 @@ setup(
     data_files=[
         ('share/applications/', ['webstat.desktop'])
     ],
+    package_data={'': ['webstat/*.desktop']},
 )

@@ -82,5 +82,4 @@ This project is under license from MIT. For more details, see the [LICENSE](LICE
 ## Credits
 
 - Saifuddin Mohammad
-- Hong Phuc VU
-- Rnd Team @ Smile
+- Team RnD @ Smile

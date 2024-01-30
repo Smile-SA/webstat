@@ -22,20 +22,29 @@ This project mainly depends on [prometheus-client==0.15.0](https://pypi.org/proj
 
 ```bash
 $ sudo add-apt-repository ppa:rnd-smile/webstat
-$ sudo apt update && sudo apt upgrade
+$ sudo apt update
 $ sudo apt install python3-webstat
 ```
 
 ## Launch ##
 
+By default, when we run webstat without specifying a particular interface, it captures packets on the lowest numerical index interface on ifconfig
+
+To specify an interface, webstat provides the `-i` parameter.
+
 ```bash
 # Launch Sniff Mode
-$ sudo webstat -m sniff
+$ sudo webstat -m sniff -i eth0
 # Sniff mode will enable all metrics on <http://localhost:8000/metrics>
 
 # Launch Analyze Mode 
 $ sudo webstat -m analyze
 # Analyze mode will enable user selected metrics on <http://localhost:8001/metrics>
+
+# Ipinfo
+$ sudo webstat -ipinfo
+# Display location information related to ipaddress
+
 ```
 
 These metrics can be added to prometheus as targets.

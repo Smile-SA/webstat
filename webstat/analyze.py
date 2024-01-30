@@ -1,4 +1,7 @@
-import subprocess,re, time
+import subprocess
+import re
+import time
+import sys
 from prometheus_client import Counter
 
 file_path = '.analyzed.txt'
@@ -26,11 +29,17 @@ def read_extract_file():
                     url_counter.labels(url).inc(hits)
 
 
-def sniff_packets():
+def sniff_packets(interface=None):
     file = open(file_path, 'w')
 
+    # Build the tcpdump command with optional interface argument
+    tcpdump_command = ['sudo', 'tcpdump']
+    if interface:
+        tcpdump_command.extend(['-i', interface])
+
     # Run TCPdump and capture the output
-    p = subprocess.Popen(['sudo', 'tcpdump'], stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL, close_fds=True)
+    p = subprocess.Popen(tcpdump_command, stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL, close_fds=True)
+
 
     # Regular expression pattern for URL matching
     url_pattern = r'(\d+:\d+:\d+\.\d+).*?(?:Type65|AAAA)\?([^\(\)]+)\('
@@ -58,12 +67,19 @@ def sniff_packets():
     # Terminate the TCPdump process
     p.terminate()
 
-def sniff_analyz_mode(arg):
-    print(f"Sniff mode is active and collecting HTTP information from network interface")
+def sniff_analyz_mode(args):
+    print(f"Sniff mode is active and collecting HTTP information")
     print('Proceeding to analyze mode in 3 seconds...')
-    sniff_packets()
+    sniff_packets(args.interface)
 
-def analyze_mode():
+def analyze_mode(interface=None):
+        # Check if the specified interface exists
+    if interface:
+        try:
+            subprocess.run(['ip', 'link', 'show', 'dev', interface], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error: Interface '{interface}' does not exist.")
+            sys.exit(1)
 
     read_extract_file()
     global extract_data

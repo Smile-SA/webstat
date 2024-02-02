@@ -3,43 +3,47 @@ import re
 import time
 import sys
 from prometheus_client import Counter
+from utils import get_ip_location
 
 file_path = '.analyzed.txt'
 extract_file_path = 'extract.txt'
 extract_data = []  # Initialize an empty list for extraction
-url_counter = Counter('extracted_url_access_count', 'Number of times a URL is accessed', ['url'])
+url_counter = Counter('extracted_url_access_count', 'Number of times a URL is accessed', ['url', 'city'])
 with open(extract_file_path, "w") as file:
     pass
 
-def read_extract_file():
+def read_extract_file(args=None):
+
     # Clear the existing metrics
     url_counter.clear()
 
     with open(extract_file_path, 'r') as extract_file:
         lines = extract_file.readlines()
+
         # Skip the header line
         lines = lines[1:]
         for line in lines:
             line_parts = line.strip().split('\t')
-            if len(line_parts) == 3:
+            if len(line_parts) == 4:
                 url = line_parts[1].strip()
                 hits = line_parts[2].strip()
+                city = line_parts[3].strip()
                 if hits.isdigit():
                     hits = int(hits)
-                    url_counter.labels(url).inc(hits)
 
+                    # Increment the URL Counter metric with the city information
+                    url_counter.labels(url, city).inc(hits)
 
-def sniff_packets(interface=None):
+def sniff_packets(args=None):
     file = open(file_path, 'w')
-
+    
     # Build the tcpdump command with optional interface argument
     tcpdump_command = ['sudo', 'tcpdump']
-    if interface:
-        tcpdump_command.extend(['-i', interface])
+    if args.interface:
+        tcpdump_command.extend(['-i', args.interface])
 
     # Run TCPdump and capture the output
     p = subprocess.Popen(tcpdump_command, stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL, close_fds=True)
-
 
     # Regular expression pattern for URL matching
     url_pattern = r'(\d+:\d+:\d+\.\d+).*?(?:Type65|AAAA)\?([^\(\)]+)\('
@@ -67,18 +71,22 @@ def sniff_packets(interface=None):
     # Terminate the TCPdump process
     p.terminate()
 
-def sniff_analyz_mode(args):
+def sniff_analyz_mode(args=None):
     print(f"Sniff mode is active and collecting HTTP information")
     print('Proceeding to analyze mode in 3 seconds...')
-    sniff_packets(args.interface)
+    sniff_packets(args=args)
 
-def analyze_mode(interface=None):
-        # Check if the specified interface exists
-    if interface:
+def analyze_mode(args=None):
+
+    ip_info = get_ip_location(args=args)
+    city = ip_info.get('city')
+
+    # Check if the specified interface exists
+    if args.interface:
         try:
-            subprocess.run(['ip', 'link', 'show', 'dev', interface], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            subprocess.run(['ip', 'link', 'show', 'dev', args.interface], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         except subprocess.CalledProcessError as e:
-            print(f"Error: Interface '{interface}' does not exist.")
+            print(f"Error: Interface '{args.interface}' does not exist.")
             sys.exit(1)
 
     read_extract_file()
@@ -103,8 +111,8 @@ def analyze_mode(interface=None):
 
         # Format the output table
         output_table = ''
-        output_table += f"{'INDEX'.ljust(6)}{'DOMAIN'.ljust(40)}{'HITS'}\n"  # Include column headers
-        output_table += '-' * 54 + '\n'  # Add a separator line
+        output_table += f"{'INDEX'.ljust(6)}{'DOMAIN'.ljust(40)}{'HITS'.ljust(6)}{'CITY'.ljust(6)}\n"  # Include column headers
+        output_table += '-' * 57 + '\n'  # Add a separator line
         
         # Aggregate hits for the same domain
         aggregated_counts = {}
@@ -113,7 +121,7 @@ def analyze_mode(interface=None):
         
         for index, (domain, hits) in enumerate(aggregated_counts.items(), start=1):
             domain = domain.ljust(40)
-            output_table += f"{str(index).ljust(6)}{domain}{str(hits)}\n"
+            output_table += f"{str(index).ljust(6)}{domain}{str(hits).ljust(6)}{str(city).ljust(6)}\n"
 
         # Clear the screen and print the formatted table
         print('\033c', end='')
@@ -136,9 +144,9 @@ def analyze_mode(interface=None):
                         extract_data.extend(new_domains)
                         extract_data.sort(key=lambda x: x[1], reverse=True)
                         with open(extract_file_path, 'w') as file:
-                            file.write('INDEX\tDOMAIN\tHITS\n')
+                            file.write('INDEX\tDOMAIN\tHITS\tCITY\n')
                             for index, (domain, hits) in enumerate(extract_data, start=1):
-                                file.write(f"{str(index)}\t{domain}\t{str(hits)}\n")
+                                file.write(f"{str(index)}\t{domain}\t{str(hits)}\t{str(city)}\n")
                         print("Data extracted to 'extract.txt'")
   
                     else:
@@ -165,7 +173,7 @@ def analyze_mode(interface=None):
                 print("Invalid index. Data not extracted.")
 
         elif extraction_option.lower() == 'd':
-            display_domains(output_table)
+            display_domains(output_table,city)
 
         elif extraction_option.lower() == 'q':
             return
@@ -178,9 +186,10 @@ def analyze_mode(interface=None):
     except FileNotFoundError:
         print("No requests so far. Please try again later.")
 
-def display_domains(output_table):
+def display_domains(output_table,city):
     while True:
         print('\033c', end='')
+        
         # Extract domains and hits from the output_table
         domain_hits = {}  # Use a dictionary to store domains and their hits
         for line in output_table.splitlines()[3:]:
@@ -192,12 +201,12 @@ def display_domains(output_table):
         # Sort the domains by hits in descending order
         sorted_domain_hits = sorted(domain_hits.items(), key=lambda x: x[1], reverse=True)
 
-        # Display the domains with hits
-        print("INDEX DOMAIN                                  HITS")
-        print("------------------------------------------------------")
+        # Display the domains with hits, including 'city'
+        print("INDEX DOMAIN                                  HITS  CITY")
+        print("-----------------------------------------------------------")
         index = 1
         for domain, hits in sorted_domain_hits:
-            print(f"{str(index).ljust(6)}{domain.ljust(40)}{str(hits)}")
+            print(f"{str(index).ljust(6)}{domain.ljust(40)}{str(hits).ljust(6)}{city}")
             index += 1
 
         user_input = input("Enter an index to display all subdomains related to the main domain, 'b' to go back, or any other key to refresh: ")
@@ -233,8 +242,8 @@ def display_domains(output_table):
 
         # Format the updated output_table
         output_table = ''
-        output_table += f"{'INDEX'.ljust(6)}{'DOMAIN'.ljust(40)}{'HITS'}\n"  # Include column headers
-        output_table += '-' * 54 + '\n'  # Add a separator line
+        output_table += f"{'INDEX'.ljust(6)}{'DOMAIN'.ljust(40)}{'HITS'.ljust(6)}{'CITY'.ljust(6)}\n"  # Include column headers
+        output_table += '-' * 6 + '\n'  # Add a separator line
 
         # Aggregate hits for the same domain
         aggregated_counts = {}
@@ -243,10 +252,9 @@ def display_domains(output_table):
 
         for index, (domain, hits) in enumerate(aggregated_counts.items(), start=1):
             domain = domain.ljust(40)
-            output_table += f"{str(index).ljust(6)}{domain}{str(hits)}\n"
+            output_table += f"{str(index).ljust(6)}{domain}{str(hits).ljust(6)}{str(city).ljust(6)}\n"
 
         time.sleep(1)
-
 
 def display_subdomains(domain):
     # Fetch the latest output_table

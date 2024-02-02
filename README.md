@@ -2,7 +2,7 @@
 
 ## About ##
 
-This python module wrapped in a debian package enables users to inspect and export their http traffic. 
+This python module wrapped in a [debian](https://launchpad.net/~rnd-smile/+archive/ubuntu/webstat) package enables users to inspect and export their http traffic. 
 
 It provides 2 modes: Sniff and Analyze. The Analyze mode will provide an interactive terminal where the user can choose and export http traffic as metrics over Prometheus, while Sniff mode will inspect entire traffic in real time and expose it as metrics to prometheus. In the first case, users have full control over the data they want to share, in the second, extraction and metrics retrieval is automated.
 
@@ -32,18 +32,28 @@ By default, when we run webstat without specifying a particular interface, it ca
 
 To specify an interface, webstat provides the `-i` parameter.
 
+### Parameters ###
+
+`-i, --interface`  
+Description: Specifies the network interface to capture packets from.  
+Usage: -i <interface_name>
+
+`-m, --mode`  
+Description: Sets the mode of operation for Webstat. Choose either 'sniff' to capture packets or 'analyze' to process and analyze captured data.  
+Usage: -m <sniff/analyze>
+
+`-ip, --ipinfo`  
+Description: Enables the exposure of location information in the captured data.  
+Usage: -ip
+
 ```bash
 # Launch Sniff Mode
-$ sudo webstat -m sniff -i eth0
+$ sudo webstat -m sniff -i eth0 -ip
 # Sniff mode will enable all metrics on <http://localhost:8000/metrics>
 
 # Launch Analyze Mode 
 $ sudo webstat -m analyze
 # Analyze mode will enable user selected metrics on <http://localhost:8001/metrics>
-
-# Ipinfo
-$ sudo webstat -ipinfo
-# Display location information related to ipaddress
 
 ```
 
@@ -82,7 +92,7 @@ We can now access the Prometheus UI by visiting http://localhost:9090 in any web
 ## Remove Webstat ##
 
 ```bash
-sudo apt purge --auto-remove python3-webstat
+$ sudo apt purge --auto-remove python3-webstat
 ```
 ## License ##
 

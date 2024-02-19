@@ -1,20 +1,20 @@
 import requests
 
 def get_ip_location(args=None):
-    
     """
     Get IP-based location information using ipinfo.io.
     """
-    if args and args.ipinfo:
-                
-        response = requests.get('https://ipinfo.io/json')
-        
-        if response.status_code == 200:
-            ip_info = response.json()
-            return ip_info
-        else:
-            print(f"Failed to retrieve IP information from ipinfo. Status code: {response.status_code}")
-            print(f"Response content: {response.content}")
-            return {'city': 'Unknown'}  # Provide a default value for city when IP information retrieval fails
+    response = requests.get('https://ipinfo.io/json')
+    ip_info = response.json()
+
+    if args.location and args.ip:
+        return {'ip': ip_info.get('ip', 'Unknown'), 'city': ip_info.get('city', 'Unknown')} # Return IP address and Location
+           
+    elif args and args.location:
+        return {'city': ip_info.get('city', 'Unknown'), 'ip': 'Unknown'}  # Return city information
+    
+    elif args and args.ip:
+        return {'ip': ip_info.get('ip', 'Unknown'), 'city': 'Unknown'}  # Return IP information
+
     else:
-        return {'NO ARGUMENT': None}  # Provide a default value for city when args is None or -ip flag is not present
+        return {'ip': 'Unknown', 'city': 'Unknown'}  # Provide default values when args is None or neither -ip nor -location flags are present

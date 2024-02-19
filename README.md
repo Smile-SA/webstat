@@ -28,27 +28,29 @@ $ sudo apt install python3-webstat
 
 ## Launch ##
 
-By default, when we run webstat without specifying a particular interface, it captures packets on the lowest numerical index interface on ifconfig
-
-To specify an interface, webstat provides the `-i` parameter.
+By default, webstat captures packets on the lowest numerical index interface on `ifconfig` if user doesn't specify a particular interface.
 
 ### Parameters ###
 
-`-i, --interface`  
+`-i`  
 Description: Specifies the network interface to capture packets from.  
-Usage: -i <interface_name>
+Usage: `-i <interface_name>`
 
-`-m, --mode`  
+`-m`  
 Description: Sets the mode of operation for Webstat. Choose either 'sniff' to capture packets or 'analyze' to process and analyze captured data.  
-Usage: -m <sniff/analyze>
+Usage:  `-m <sniff/analyze>`
 
-`-ip, --ipinfo`  
-Description: Enables the exposure of location information in the captured data.  
-Usage: -ip
+`--ip`  
+Description: Enables the exposure of ip address information in the captured data.  
+Usage:  `--ip `
+
+`--location`  
+Description: Enables the exposure of location/city information in the captured data.  
+Usage:  `--location `
 
 ```bash
 # Launch Sniff Mode
-$ sudo webstat -m sniff -i eth0 -ip
+$ sudo webstat -m sniff -i eth0 --ip --location
 # Sniff mode will enable all metrics on <http://localhost:8000/metrics>
 
 # Launch Analyze Mode 
@@ -99,6 +101,4 @@ $ sudo apt purge --auto-remove python3-webstat
 This project is under license from MIT. For more details, see the [LICENSE](LICENSE.md) file.
 
 ## Credits
-
-- Saifuddin Mohammad
 - Team RnD @ Smile

@@ -7,45 +7,37 @@ from utils import get_ip_location
 
 file_path = '.analyzed.txt'
 extract_file_path = 'extract.txt'
-extract_data = []  # Initialize an empty list for extraction
-url_counter = Counter('extracted_url_access_count', 'Number of times a URL is accessed', ['url', 'city'])
-with open(extract_file_path, "w") as file:
+extract_data = []
+url_counter = Counter('extracted_url_access_count', 'Number of times a URL is accessed', ['url', 'city', 'ip'])
+
+with open(extract_file_path, "w"):
     pass
 
 def read_extract_file(args=None):
-
     # Clear the existing metrics
     url_counter.clear()
 
     with open(extract_file_path, 'r') as extract_file:
-        lines = extract_file.readlines()
-
-        # Skip the header line
-        lines = lines[1:]
+        lines = extract_file.readlines()[1:]
         for line in lines:
             line_parts = line.strip().split('\t')
-            if len(line_parts) == 4:
-                url = line_parts[1].strip()
-                hits = line_parts[2].strip()
-                city = line_parts[3].strip()
+            if len(line_parts) == 5:
+                url, hits, ip, city = map(str.strip, line_parts[1:])
                 if hits.isdigit():
                     hits = int(hits)
-
                     # Increment the URL Counter metric with the city information
-                    url_counter.labels(url, city).inc(hits)
+                    url_counter.labels(url, city, ip).inc(hits)
 
 def sniff_packets(args=None):
-    file = open(file_path, 'w')
-    
-    # Build the tcpdump command with optional interface argument
+    with open(file_path, 'w'):
+        pass
+
     tcpdump_command = ['sudo', 'tcpdump']
-    if args.interface:
+    if args and args.interface:
         tcpdump_command.extend(['-i', args.interface])
 
     # Run TCPdump and capture the output
     p = subprocess.Popen(tcpdump_command, stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL, close_fds=True)
-
-    # Regular expression pattern for URL matching
     url_pattern = r'(\d+:\d+:\d+\.\d+).*?(?:Type65|AAAA)\?([^\(\)]+)\('
 
     # Loop through each line of output from TCPdump
@@ -54,19 +46,13 @@ def sniff_packets(args=None):
         matches = re.search(url_pattern, line)
         if matches:
             # Get the matched time and URL
-            time_str = matches.group(1)
-            url = matches.group(2)
-
-            # Get the current system date
+            time_str, url = map(str.strip, matches.group(1, 2))
             current_date = time.strftime("%Y-%m-%d", time.localtime())
-
-            # Combine the current date with the extracted time
             timestamp_str = f"{current_date} {time_str}"
             timestamp = int(time.mktime(time.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")))
-
-            # Write the URL with the timestamp to the file
-            file.write(f"{url},{timestamp}\n")
-            file.flush()
+            with open(file_path, 'a') as file:
+                file.write(f"{url},{timestamp}\n")
+                file.flush()
 
     # Terminate the TCPdump process
     p.terminate()
@@ -77,12 +63,10 @@ def sniff_analyz_mode(args=None):
     sniff_packets(args=args)
 
 def analyze_mode(args=None):
-
     ip_info = get_ip_location(args=args)
-    city = ip_info.get('city')
+    city, ip = ip_info.get('city'), ip_info.get('ip')
 
-    # Check if the specified interface exists
-    if args.interface:
+    if args and args.interface:
         try:
             subprocess.run(['ip', 'link', 'show', 'dev', args.interface], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         except subprocess.CalledProcessError as e:
@@ -94,42 +78,32 @@ def analyze_mode(args=None):
 
     try:
         with open(file_path, 'r') as file:
-            lines = file.readlines()
+            lines = file.readlines()[::-1]
 
-        # Reverse the order of lines to show most recent entries at the top
-        lines = lines[::-1]
-
-        # Count the occurrences of each URL and get the corresponding timestamps
         url_counts = {}
         for line in lines:
             domain, timestamp = line.strip().split(',')
-            key = domain  # Remove timestamp from the key
-            url_counts[key] = url_counts.get(key, 0) + 1
+            key, hits = domain, url_counts.get(domain, 0) + 1
+            url_counts[key] = hits
 
-        # Sort the URL counts by hits in descending order
         sorted_counts = sorted(url_counts.items(), key=lambda x: x[1], reverse=True)
 
-        # Format the output table
-        output_table = ''
-        output_table += f"{'INDEX'.ljust(6)}{'DOMAIN'.ljust(40)}{'HITS'.ljust(6)}{'CITY'.ljust(6)}\n"  # Include column headers
-        output_table += '-' * 57 + '\n'  # Add a separator line
-        
-        # Aggregate hits for the same domain
+        output_table = f"{'INDEX'.ljust(6)}{'DOMAIN'.ljust(57)}{'HITS'.ljust(6)}{'IP'.ljust(15)} {'CITY'}\n" + '-' * 100 + '\n'
+
         aggregated_counts = {}
         for (domain, hits) in sorted_counts:
             aggregated_counts[domain] = aggregated_counts.get(domain, 0) + hits
-        
-        for index, (domain, hits) in enumerate(aggregated_counts.items(), start=1):
-            domain = domain.ljust(40)
-            output_table += f"{str(index).ljust(6)}{domain}{str(hits).ljust(6)}{str(city).ljust(6)}\n"
 
-        # Clear the screen and print the formatted table
+        for index, (domain, hits) in enumerate(aggregated_counts.items(), start=1):
+            domain = (domain[:53] + '...') if len(domain) > 57 else domain
+            domain = domain.ljust(40)
+            output_table += f"{str(index).ljust(6)}{domain.ljust(57)}{str(hits).ljust(6)}{str(ip).ljust(15)} {str(city).ljust(6)}\n"
+
         print('\033c', end='')
         print(output_table)
 
-        # Prompt the user for extraction option
         extraction_option = input("Select extraction option: [e] Substring-based, [i] Index-based, [d] Display domains, [Enter] Refresh: ")
-        
+
         if extraction_option.lower() == 'e':
             selected_text = input("Enter the text to extract domains (e.g., smile, google): ")
             if selected_text:
@@ -137,18 +111,17 @@ def analyze_mode(args=None):
                                     if selected_text.lower() in domain.lower()]
 
                 if selected_domains:
-                    existing_domains = set([item[0] for item in extract_data])
+                    existing_domains = set(item[0] for item in extract_data)
                     new_domains = [item for item in selected_domains if item[0] not in existing_domains]
 
                     if new_domains:
                         extract_data.extend(new_domains)
                         extract_data.sort(key=lambda x: x[1], reverse=True)
                         with open(extract_file_path, 'w') as file:
-                            file.write('INDEX\tDOMAIN\tHITS\tCITY\n')
+                            file.write('INDEX\tDOMAIN\tHITS\tIP\tCITY\n')
                             for index, (domain, hits) in enumerate(extract_data, start=1):
-                                file.write(f"{str(index)}\t{domain}\t{str(hits)}\t{str(city)}\n")
+                                file.write(f"{str(index)}\t{domain}\t{str(hits)}\t{ip}\t{str(city)}\n")
                         print("Data extracted to 'extract.txt'")
-  
                     else:
                         print("Input domain already exists. Data not extracted.")
                 else:
@@ -173,7 +146,7 @@ def analyze_mode(args=None):
                 print("Invalid index. Data not extracted.")
 
         elif extraction_option.lower() == 'd':
-            display_domains(output_table,city)
+            display_domains(output_table, city, ip)
 
         elif extraction_option.lower() == 'q':
             return
@@ -186,30 +159,37 @@ def analyze_mode(args=None):
     except FileNotFoundError:
         print("No requests so far. Please try again later.")
 
-def display_domains(output_table,city):
+def display_domains(output_table, city, ip):
     while True:
         print('\033c', end='')
-        
-        # Extract domains and hits from the output_table
-        domain_hits = {}  # Use a dictionary to store domains and their hits
-        for line in output_table.splitlines()[3:]:
-            parts = line.split()
-            domain = parts[1].split('.')[1]
-            hits = int(parts[2])
-            domain_hits[domain] = domain_hits.get(domain, 0) + hits
+        domain_hits = {}
 
-        # Sort the domains by hits in descending order
+        for line in output_table.splitlines()[3:]:
+            print("LINE: " + line)
+            time.sleep(7)
+            parts = line.split()
+            print("PARTS: ")
+            print(parts)
+            time.sleep(7)
+            domain, hits = parts[1].split('.')[1], int(parts[2])
+            print("DOMAIN: " + domain, "HITS: " + hits)
+            time.sleep(7)
+            domain_hits[domain] = domain_hits.get(domain, 0) + hits
+            print("DOMAIN_HITS: " + domain_hits)
+            time.sleep(7)
+
         sorted_domain_hits = sorted(domain_hits.items(), key=lambda x: x[1], reverse=True)
 
-        # Display the domains with hits, including 'city'
-        print("INDEX DOMAIN                                  HITS  CITY")
-        print("-----------------------------------------------------------")
+        output_table = f"{'INDEX'.ljust(6)}{'DOMAIN'.ljust(57)}{'HITS'.ljust(6)}{'IP'.ljust(15)} {'CITY'}\n" + '-' * 100 + '\n'
         index = 1
+
         for domain, hits in sorted_domain_hits:
-            print(f"{str(index).ljust(6)}{domain.ljust(40)}{str(hits).ljust(6)}{city}")
+            output_table += f"{str(index).ljust(6)}{domain.ljust(57)}{str(hits).ljust(6)}{str(ip).ljust(15)} {str(city).ljust(6)}\n"
             index += 1
 
+        print(output_table)
         user_input = input("Enter an index to display all subdomains related to the main domain, 'b' to go back, or any other key to refresh: ")
+
         if user_input.lower() == 'b':
             break
 
@@ -223,58 +203,43 @@ def display_domains(output_table,city):
             else:
                 print("Invalid index. Please try again.")
 
-        # Fetch the latest output_table
         with open(file_path, 'r') as file:
-            lines = file.readlines()
+            lines = file.readlines()[::-1]
 
-        # Reverse the order of lines to show most recent entries at the top
-        lines = lines[::-1]
-
-        # Count the occurrences of each URL and get the corresponding timestamps
         url_counts = {}
         for line in lines:
             domain, timestamp = line.strip().split(',')
-            key = domain  # Remove timestamp from the key
-            url_counts[key] = url_counts.get(key, 0) + 1
+            key, hits = domain, url_counts.get(domain, 0) + 1
+            url_counts[key] = hits
 
-        # Sort the URL counts by hits in descending order
-        sorted_counts = sorted(url_counts.items(), key=lambda x: x[1], reverse=True)
-
-        # Format the updated output_table
-        output_table = ''
-        output_table += f"{'INDEX'.ljust(6)}{'DOMAIN'.ljust(40)}{'HITS'.ljust(6)}{'CITY'.ljust(6)}\n"  # Include column headers
-        output_table += '-' * 6 + '\n'  # Add a separator line
-
-        # Aggregate hits for the same domain
+        output_table = f"{'INDEX'.ljust(6)}{'DOMAIN'.ljust(40)}{'HITS'.ljust(6)}{'IP'.ljust(6)}{'CITY'.ljust(6)}\n" + '-' * 100 + '\n'
         aggregated_counts = {}
-        for (domain, hits) in sorted_counts:
+
+        for (domain, hits) in sorted(url_counts.items(), key=lambda x: x[1], reverse=True):
             aggregated_counts[domain] = aggregated_counts.get(domain, 0) + hits
 
         for index, (domain, hits) in enumerate(aggregated_counts.items(), start=1):
             domain = domain.ljust(40)
-            output_table += f"{str(index).ljust(6)}{domain}{str(hits).ljust(6)}{str(city).ljust(6)}\n"
+            output_table += f"{str(index).ljust(6)}{domain.ljust(57)}{str(hits).ljust(6)}{str(ip).ljust(15)}{str(city).ljust(6)}\n"
 
         time.sleep(1)
 
 def display_subdomains(domain):
-    # Fetch the latest output_table
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
-    # Extract subdomains related to the main domain
     subdomains = {}
     for line in lines:
         line_parts = line.strip().split(',')
-        line_domain = line_parts[0]
-        timestamp = line_parts[1]
-        hits = int(line_parts[2]) if len(line_parts) > 2 else 0
+        line_domain, timestamp, hits = line_parts[0], line_parts[1], int(line_parts[2]) if len(line_parts) > 2 else 0
 
         if domain in line_domain:
             subdomains[line_domain] = subdomains.get(line_domain, 0) + hits
 
     if subdomains:
         print(f"\nSubdomains containing {domain}:")
-        print("----------------------------------")
+        print('-' * 100 + '\n')
+
         for subdomain, hits in subdomains.items():
             print(f"{subdomain.ljust(40)}")
     else:

@@ -29,22 +29,23 @@ def sniff_packets(args=None):
     url_pattern = r'(?:Type65|AAAA)\?\s*([^\(\)\s]+)\s*\('
 
     # Initialize a Counter metric for URL occurrences
-    url_counter = Counter('url_access_count', 'Number of times a URL is accessed', ['url', 'city'])  # Added 'city' label
+    url_counter = Counter('url_access_count', 'Number of times a URL is accessed', ['url', 'city', 'ip'])  # Added 'city' label
         
     # Loop through each line of output from TCPdump
     for line in iter(p.stdout.readline, ''):
         # Find URLs matching the pattern in the line
         matches = re.search(url_pattern, line)
         if matches:
-            # Get city information from get_ip_location with the provided args
+        # Get city and IP information from get_ip_location with the provided args
             city = ip_info.get('city')
+            ip = ip_info.get('ip')
 
-            # Write each URL to a file
-            file.write(f"{matches.group(1)} - {city}\n")
+            # Write both URL and IP to a file
+            file.write(f"{matches.group(1)} - City: {city}, IP: {ip}\n")
             file.flush()
 
             # Increment the URL Counter metric
-            url_counter.labels(matches.group(1), city).inc()
+            url_counter.labels(matches.group(1), city, ip).inc()
 
     # Terminate the TCPdump process
     p.terminate()

@@ -91,6 +91,19 @@ $ sudo systemctl restart prometheus
 
 We can now access the Prometheus UI by visiting http://localhost:9090 in any web browser. From there, we can view real time http activity.
 
+## Extending webstat to retrieve more information ##
+
+In order to add more columns to the analyze and sniff mode of webstat, we can take a look at `webstat/utils.py` to retrieve more information about the server. Both modes retrieve the function from this file so we can further integrate new information into the sniff and analyze modes:
+
+`webstat/sniff.py`  
+Update the `url_counter` to retrieve the new information available in `webstat/utils.py`.
+
+`webstat/analyze.py`  
+Update `url_counter` as well as every instance of `output_table` to retrieve the new information from `webstat/utils.py` and display in the interactive console.
+
+`webstat/main.py`  
+Then, we can modify this file to add more flags if required. 
+
 ## Remove Webstat ##
 
 ```bash

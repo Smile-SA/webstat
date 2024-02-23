@@ -28,6 +28,8 @@ $ sudo apt install python3-webstat
 
 ## Launch ##
 
+It is recommended to launch webstat with sudo permissions.
+
 By default, webstat captures packets on the lowest numerical index interface on `ifconfig` if user doesn't specify a particular interface.
 
 ### Parameters ###

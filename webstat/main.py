@@ -1,5 +1,6 @@
 import argparse
 import os
+import datetime
 import threading
 import time
 from sniff import sniff_packets
@@ -26,6 +27,8 @@ def main():
         print('Location Information is extracted')
 
     if args.mode == 'analyze':
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        extract_file_path = os.path.join(os.path.expanduser("~"), f'webstat_{timestamp}.txt')
         try:
             # Start Prometheus HTTP server
             start_http_server(8001)
@@ -42,7 +45,7 @@ def main():
 
         except KeyboardInterrupt:
             print("\n\nExiting Analyze Mode..\n")
-            print("\nDomain information extracted to extract.txt\n")
+            print(f"\nDomain information extracted to {extract_file_path}\n")
             os._exit(130)
     else:
         try:

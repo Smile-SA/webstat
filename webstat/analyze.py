@@ -1,12 +1,16 @@
 import subprocess
 import re
+import os
 import time
 import sys
+import datetime
 from prometheus_client import Counter
 from utils import get_ip_location
 
-file_path = '.analyzed.txt'
-extract_file_path = 'extract.txt'
+# Add a timestamp to the extract file name
+timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+extract_file_path = os.path.join(os.path.expanduser("~"), f'webstat_{timestamp}.txt')
+file_path = '/tmp/.analyzed.txt'
 extract_data = []
 url_counter = Counter('extracted_url_access_count', 'Number of times a URL is accessed', ['url', 'city', 'ip'])
 
@@ -121,7 +125,7 @@ def analyze_mode(args=None):
                             file.write('INDEX\tDOMAIN\tHITS\tIP\tCITY\n')
                             for index, (domain, hits) in enumerate(extract_data, start=1):
                                 file.write(f"{str(index)}\t{domain}\t{str(hits)}\t{ip}\t{str(city)}\n")
-                        print("Data extracted to 'extract.txt'")
+                        print(f"Data extracted to '{extract_file_path}'.")
                     else:
                         print("Input domain already exists. Data not extracted.")
                 else:
@@ -139,7 +143,7 @@ def analyze_mode(args=None):
                     extract_data.append((domain, hits))
                     with open(extract_file_path, 'a') as file:
                         file.write(f"{str(len(extract_data))}\t{domain}\t{str(hits)}\n")
-                    print("Data extracted to 'extract.txt'")
+                    print(f"Data extracted to '{extract_file_path}'.")
                 else:
                     print("Selected domain already exists in the extraction list. Data not extracted.")
             else:

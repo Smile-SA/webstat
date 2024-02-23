@@ -8,7 +8,7 @@ except ImportError:
 
 setup(
     name='webstat',
-    version='0.7.3',
+    version='0.8.3',
     description='This module enables users to inspect and export network data',
     author='Team R&D - SMILE',
     author_email='saifuddin.mohammad@smile.fr',

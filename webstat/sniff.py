@@ -12,7 +12,7 @@ def sniff_packets(args=None):
         except subprocess.CalledProcessError:
             return
 
-    file_path = 'sniffed.txt'
+    file_path = '/tmp/.sniffed.txt'
     file = open(file_path, 'w')
     ip_info = get_ip_location(args=args)
 
@@ -29,7 +29,7 @@ def sniff_packets(args=None):
     url_pattern = r'(?:Type65|AAAA)\?\s*([^\(\)\s]+)\s*\('
 
     # Initialize a Counter metric for URL occurrences
-    url_counter = Counter('url_access_count', 'Number of times a URL is accessed', ['url', 'city', 'ip'])  # Added 'city' label
+    url_counter = Counter('url_access_count', 'Number of times a URL is accessed', ['url', 'city', 'ip']) 
         
     # Loop through each line of output from TCPdump
     for line in iter(p.stdout.readline, ''):
@@ -40,7 +40,6 @@ def sniff_packets(args=None):
             city = ip_info.get('city')
             ip = ip_info.get('ip')
 
-            # Write both URL and IP to a file
             file.write(f"{matches.group(1)} - City: {city}, IP: {ip}\n")
             file.flush()
 

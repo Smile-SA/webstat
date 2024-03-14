@@ -1,6 +1,5 @@
 import argparse
 import os
-import datetime
 import threading
 import time
 from sniff import sniff_packets
@@ -27,8 +26,7 @@ def main():
         print('Location Information is extracted')
 
     if args.mode == 'analyze':
-        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        extract_file_path = os.path.join(os.path.expanduser("~"), f'webstat_{timestamp}.txt')
+        extract_file_path = os.path.join(os.path.expanduser("~"), ".local", "webstat")
         try:
             # Start Prometheus HTTP server
             start_http_server(8001)

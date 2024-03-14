@@ -4,12 +4,17 @@ import os
 import time
 import sys
 import datetime
+import signal
 from prometheus_client import Counter
 from utils import get_ip_location
 
-# Add a timestamp to the extract file name
 timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-extract_file_path = os.path.join(os.path.expanduser("~"), f'webstat_{timestamp}.txt')
+user_home = os.path.expanduser("~")
+new_directory = os.path.join(user_home, ".local", "webstat")
+os.makedirs(new_directory, exist_ok=True)
+
+extract_file_path = os.path.join(new_directory, f'webstat_{timestamp}.txt')
+
 file_path = '/tmp/.analyzed.txt'
 extract_data = []
 url_counter = Counter('extracted_url_access_count', 'Number of times a URL is accessed', ['url', 'city', 'ip'])
@@ -66,9 +71,22 @@ def sniff_analyz_mode(args=None):
     print('Proceeding to analyze mode in 3 seconds...')
     sniff_packets(args=args)
 
+class CustomError(Exception):
+    pass
+
+def alarm_handler(signum, frame):
+    raise CustomError
+
 def analyze_mode(args=None):
-    ip_info = get_ip_location(args=args)
-    city, ip = ip_info.get('city'), ip_info.get('ip')
+    ip = city = 'Unknown'
+
+    if args and args.ip:
+        ip_info = get_ip_location(args=args)
+        ip = ip_info.get('ip')
+
+    if args and args.location:
+        ip_info = get_ip_location(args=args)
+        city = ip_info.get('city')
 
     if args and args.interface:
         try:
@@ -106,8 +124,14 @@ def analyze_mode(args=None):
         print('\033c', end='')
         print(output_table)
 
-        extraction_option = input("Select extraction option: [e] Substring-based, [i] Index-based, [d] Display domains, [Enter] Refresh: ")
-
+        signal.signal(signal.SIGALRM, alarm_handler)
+        signal.alarm(3)
+        try:
+            extraction_option = input("Select extraction option: [e] Substring-based, [i] Index-based, [d] Display domains, [Enter] Refresh: ")
+            signal.alarm(0)
+        except CustomError:
+            extraction_option = 'none'
+        
         if extraction_option.lower() == 'e':
             selected_text = input("Enter the text to extract domains (e.g., smile, google): ")
             if selected_text:
@@ -169,18 +193,9 @@ def display_domains(output_table, city, ip):
         domain_hits = {}
 
         for line in output_table.splitlines()[3:]:
-            print("LINE: " + line)
-            time.sleep(7)
             parts = line.split()
-            print("PARTS: ")
-            print(parts)
-            time.sleep(7)
             domain, hits = parts[1].split('.')[1], int(parts[2])
-            print("DOMAIN: " + domain, "HITS: " + hits)
-            time.sleep(7)
             domain_hits[domain] = domain_hits.get(domain, 0) + hits
-            print("DOMAIN_HITS: " + domain_hits)
-            time.sleep(7)
 
         sorted_domain_hits = sorted(domain_hits.items(), key=lambda x: x[1], reverse=True)
 

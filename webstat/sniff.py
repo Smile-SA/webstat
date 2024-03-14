@@ -4,6 +4,15 @@ from prometheus_client import Counter
 from utils import get_ip_location
 
 def sniff_packets(args=None):
+    ip = city = 'Unknown'
+
+    if args and args.ip:
+        ip_info = get_ip_location(args=args)
+        ip = ip_info.get('ip')
+
+    if args and args.location:
+        ip_info = get_ip_location(args=args)
+        city = ip_info.get('city')
 
     if args and args.interface:
         try:
@@ -14,7 +23,6 @@ def sniff_packets(args=None):
 
     file_path = '/tmp/.sniffed.txt'
     file = open(file_path, 'w')
-    ip_info = get_ip_location(args=args)
 
     # Build the tcpdump command with optional interface argument
     tcpdump_command = ['sudo', 'tcpdump']
@@ -36,10 +44,6 @@ def sniff_packets(args=None):
         # Find URLs matching the pattern in the line
         matches = re.search(url_pattern, line)
         if matches:
-        # Get city and IP information from get_ip_location with the provided args
-            city = ip_info.get('city')
-            ip = ip_info.get('ip')
-
             file.write(f"{matches.group(1)} - City: {city}, IP: {ip}\n")
             file.flush()
 

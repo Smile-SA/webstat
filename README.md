@@ -18,6 +18,11 @@ Opens an interactive terminal with a real-time network activity report. User can
 
 This project mainly depends on [prometheus-client==0.15.0](https://pypi.org/project/prometheus/) and is automatically managed by webstat.
 
+## Ubuntu packages ##
+
+Webstat is supported on following Ubuntu series and is available on the [launchpad](https://launchpad.net/~rnd-smile/+archive/ubuntu/webstat/+packages).
+
+![alt text](assets/image.png)
 ## Installation ##
 
 ```bash
